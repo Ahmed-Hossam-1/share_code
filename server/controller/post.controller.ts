@@ -1,17 +1,17 @@
-import { db } from "../datastore";
-import { ExpressHandler, Post } from "../types/types";
+import { db } from '../datastore';
+import {
+  CreatePostRequest,
+  CreatePostResponse,
+  ListPostRequest,
+  ListPostResponse,
+} from '../types/api';
+import { ExpressHandler, Post } from '../types/types';
 
-export const listPosts: ExpressHandler<{}, {}> = (__, res) => {
+export const listPosts: ExpressHandler<ListPostRequest, ListPostResponse> = (__, res) => {
   res.send({ posts: db.listPosts() });
 };
 
-type CreatePostRequest = Pick<Post, "title" | "url" | "userId">;
-type CreatePostResponse = {};
-
-export const createPost: ExpressHandler<
-  CreatePostRequest,
-  CreatePostResponse
-> = (req, res) => {
+export const createPost: ExpressHandler<CreatePostRequest, CreatePostResponse> = (req, res) => {
   if (!req.body?.title || !req.body?.url || !req.body?.userId) {
     return res.sendStatus(400);
   }
@@ -24,6 +24,6 @@ export const createPost: ExpressHandler<
   };
 
   db.createPost(newPost);
-  console.log("done", req.body);
+  console.log('done', req.body);
   res.sendStatus(200);
 };
