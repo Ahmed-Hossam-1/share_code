@@ -1,4 +1,4 @@
-import { User } from "../types";
+import { User } from "../types/types";
 
 // Data Accesses Object
 export interface UserDao {
