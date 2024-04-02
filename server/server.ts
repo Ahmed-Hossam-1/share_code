@@ -1,18 +1,23 @@
 import express, { ErrorRequestHandler } from 'express';
 import { createPost, listPosts } from './controller/post.controller';
+import { initDb } from './datastore';
 
-const app = express();
+(async () => {
+  await initDb();
 
-app.use(express.json());
+  const app = express();
 
-app.get('/posts', listPosts);
-app.post('/posts', createPost);
+  app.use(express.json());
 
-const errHandler: ErrorRequestHandler = (err, _, res, __) => {
-  console.error(err);
-  res.status(500).send('Something broke!');
-};
+  app.get('/posts', listPosts);
+  app.post('/posts', createPost);
 
-app.use(errHandler);
+  const errHandler: ErrorRequestHandler = (err, _, res, __) => {
+    console.error(err);
+    res.status(500).send('Something broke!');
+  };
 
-app.listen(3000);
+  app.use(errHandler);
+
+  app.listen(3000);
+})();

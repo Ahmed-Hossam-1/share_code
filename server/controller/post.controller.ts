@@ -7,8 +7,8 @@ import {
 } from '../types/api';
 import { ExpressHandler, Post } from '../types/types';
 
-export const listPosts: ExpressHandler<ListPostRequest, ListPostResponse> = (__, res) => {
-  res.send({ posts: db.listPosts() });
+export const listPosts: ExpressHandler<ListPostRequest, ListPostResponse> = async (__, res) => {
+  res.send({ posts: await db.listPosts() });
 };
 
 export const createPost: ExpressHandler<CreatePostRequest, CreatePostResponse> = (req, res) => {
