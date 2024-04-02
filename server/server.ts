@@ -1,6 +1,7 @@
 import express, { ErrorRequestHandler } from 'express';
 import { createPost, listPosts } from './controller/post.controller';
 import { initDb } from './datastore';
+import { signInUser, signUpUser } from './controller/user.controller';
 
 (async () => {
   await initDb();
@@ -11,6 +12,8 @@ import { initDb } from './datastore';
 
   app.get('/posts', listPosts);
   app.post('/posts', createPost);
+  app.post('/signup', signUpUser);
+  app.post('/signin', signInUser);
 
   const errHandler: ErrorRequestHandler = (err, _, res, __) => {
     console.error(err);
