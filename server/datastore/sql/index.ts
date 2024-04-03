@@ -53,6 +53,9 @@ export class SqlDataStore implements DataStore {
       _post.userId
     );
   }
+  getUserById(id: string): Promise<User | undefined> {
+    return this.db.get<User>(`SELECT * FROM users WHERE id = ?`, id);
+  }
   getPost(_id: string): Promise<Post | undefined> {
     throw new Error('Method not implemented.');
   }
