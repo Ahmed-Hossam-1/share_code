@@ -1,10 +1,9 @@
 import express from 'express';
-import { createPost, listPosts } from './controller/post.controller';
-import { initDb } from './datastore';
-import { signInUser, signUpUser } from './controller/auth.controller';
-import { errHandler } from './middleware/errorMiddleware';
+import { errHandler } from './src/middleware/errorMiddleware';
+import { initDb } from './src/datastore';
 import dotenv from 'dotenv';
-import { authMiddleware } from './middleware/authMiddleware';
+import { authRouter } from './src/routes/auth.route';
+import { postRouter } from './src/routes/post.route';
 
 (async () => {
   await initDb();
@@ -13,11 +12,9 @@ import { authMiddleware } from './middleware/authMiddleware';
   const app = express();
 
   app.use(express.json());
-  app.post('/signup', signUpUser);
-  app.post('/signin', signInUser);
-  app.use(authMiddleware);
-  app.get('/posts', listPosts);
-  app.post('/posts', createPost);
+
+  app.use('/api/auth', authRouter);
+  app.use('/api/posts', postRouter);
 
   app.use(errHandler);
 

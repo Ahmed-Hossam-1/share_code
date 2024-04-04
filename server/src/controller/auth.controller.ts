@@ -3,6 +3,7 @@ import { db } from '../datastore';
 import { SignInRequest, SignInResponse, SignUpRequest, SignUpResponse } from '../types/api';
 import { ExpressHandler, User } from '../types/types';
 import crypto from 'crypto';
+import { passwordHash } from '../utils/passwordHash';
 
 export const signUpUser: ExpressHandler<SignUpRequest, SignUpResponse> = async (req, res) => {
   const { email, first_name, last_name, password, username } = req.body;
@@ -15,16 +16,12 @@ export const signUpUser: ExpressHandler<SignUpRequest, SignUpResponse> = async (
     return res.status(403).send({ error: 'User already exists' });
   }
 
-  const passwordHash = crypto
-    .pbkdf2Sync(password, process.env.PASSWORD_SALT || 'mmm', 50, 64, 'sha512')
-    .toString('hex');
-
   const newUser: User = {
     id: crypto.randomUUID(),
     email,
     first_name,
     last_name,
-    password: passwordHash,
+    password: passwordHash(password),
     username,
   };
 
@@ -39,12 +36,10 @@ export const signInUser: ExpressHandler<SignInRequest, SignInResponse> = async (
     return res.sendStatus(400);
   }
 
-  const passwordHash = crypto
-    .pbkdf2Sync(password, process.env.PASSWORD_SALT || 'mmm', 50, 64, 'sha512')
-    .toString('hex');
+  const passwordcom = passwordHash(password);
 
   const existing = (await db.getUserByEmail(login)) || (await db.getUserByUsername(login));
-  if (!existing || existing.password !== passwordHash) {
+  if (!existing || existing.password !== passwordcom) {
     return res.sendStatus(403);
   }
 
