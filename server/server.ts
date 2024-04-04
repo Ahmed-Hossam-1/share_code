@@ -4,6 +4,7 @@ import { initDb } from './src/datastore';
 import dotenv from 'dotenv';
 import { authRouter } from './src/routes/auth.route';
 import { postRouter } from './src/routes/post.route';
+import { commmentRouter } from './src/routes/comments.route';
 
 (async () => {
   await initDb();
@@ -15,6 +16,7 @@ import { postRouter } from './src/routes/post.route';
 
   app.use('/api/auth', authRouter);
   app.use('/api/posts', postRouter);
+  app.use('/api/comments', commmentRouter);
 
   app.use(errHandler);
 

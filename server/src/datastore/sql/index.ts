@@ -56,22 +56,49 @@ export class SqlDataStore implements DataStore {
   getUserById(id: string): Promise<User | undefined> {
     return this.db.get<User>(`SELECT * FROM users WHERE id = ?`, id);
   }
-  getPost(_id: string): Promise<Post | undefined> {
-    throw new Error('Method not implemented.');
+  getPost(id: string): Promise<Post | undefined> {
+    return this.db.get<Post>(`SELECT * FROM posts WHERE id = ?`, id);
   }
-  deletePost(_id: string): Promise<void> {
-    throw new Error('Method not implemented.');
+  // async getPost(id: string, userId: string): Promise<Post | undefined> {
+  //   return await this.db.get<Post>(
+  //     `SELECT *, EXISTS(
+  //       SELECT 1 FROM likes WHERE likes.postId = ? AND likes.userId = ?
+  //     ) as liked FROM posts WHERE id = ?`,
+  //     id,
+  //     userId,
+  //     id
+  //   );
+  // }
+  async deletePost(id: string): Promise<void> {
+    await this.db.run('Delete FROM posts WHERE id = ?', id);
+  }
+  async createComments(comment: Comment): Promise<void> {
+    await this.db.run(
+      'INSERT INTO Comments(id, userId, postId, comment, postedAt) VALUES(?,?,?,?,?)',
+      comment.id,
+      comment.userId,
+      comment.postId,
+      comment.comment,
+      comment.postedAt
+    );
+  }
+  async listComments(postId: string): Promise<Comment[]> {
+    return await this.db.all<Comment[]>(
+      'SELECT * FROM comments WHERE postId = ? ORDER BY postedAt DESC',
+      postId
+    );
+  }
+  async deleteComment(id: string): Promise<void> {
+    await this.db.run('DELETE FROM comments WHERE id = ?', id);
+  }
+  async countComments(postId: string): Promise<number> {
+    const result = await this.db.get<{ count: number }>(
+      'SELECT COUNT(*) as count FROM comments WHERE postId = ?',
+      postId
+    );
+    return result?.count ?? 0;
   }
   createLike(_like: Like): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
-  createComments(_comment: Comment): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
-  listComments(_postId: string): Promise<Comment[]> {
-    throw new Error('Method not implemented.');
-  }
-  deleteComment(_id: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
 }
