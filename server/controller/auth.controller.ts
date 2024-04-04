@@ -29,7 +29,8 @@ export const signUpUser: ExpressHandler<SignUpRequest, SignUpResponse> = async (
   };
 
   await db.createUser(newUser);
-  res.sendStatus(201).send({ jwt: createJwt({ userId: newUser.id }) });
+  const jwt = await createJwt({ userId: newUser.id });
+  res.status(201).send({ jwt });
 };
 
 export const signInUser: ExpressHandler<SignInRequest, SignInResponse> = async (req, res) => {
@@ -47,6 +48,8 @@ export const signInUser: ExpressHandler<SignInRequest, SignInResponse> = async (
     return res.sendStatus(403);
   }
 
+  const jwt = await createJwt({ userId: existing.id });
+
   return res.status(200).send({
     user: {
       id: existing.id,
@@ -55,6 +58,6 @@ export const signInUser: ExpressHandler<SignInRequest, SignInResponse> = async (
       username: existing.username,
       email: existing.email,
     },
-    jwt: createJwt({ userId: existing.id }),
+    jwt: jwt,
   });
 };
