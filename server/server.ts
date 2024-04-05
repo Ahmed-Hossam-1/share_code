@@ -5,12 +5,13 @@ import dotenv from 'dotenv';
 import { authRouter } from './src/routes/auth.route';
 import { postRouter } from './src/routes/post.route';
 import { commmentRouter } from './src/routes/comments.route';
+import cors from 'cors';
 
 (async () => {
   await initDb();
   dotenv.config();
-
   const app = express();
+  app.use(cors()); // cors is a middleware
 
   app.use(express.json());
 
