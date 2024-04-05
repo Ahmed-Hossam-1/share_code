@@ -1,20 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { FormErrorMessage, FormLabel, FormControl, Input, Button } from '@chakra-ui/react';
+import { FormLabel, FormControl, Input, Button } from '@chakra-ui/react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { signupSchema } from '../utils/validations';
+import { useSignupUser } from '../services/mutations';
 
 const Signup = () => {
-  const signupSchema = z.object({
-    username: z.string().min(1, { message: 'User Name is required' }),
-    first_name: z.string().min(1, { message: 'First Name is required' }),
-    last_name: z.string().min(1, { message: 'last Name is required' }),
-    email: z
-      .string()
-      .min(1, { message: 'Email is required' })
-      .email({ message: 'Not Vaild Email' }),
-    password: z.string().min(6, { message: 'password mast be at least 6 char' }),
-  });
   type ISignUp = z.infer<typeof signupSchema>;
   const {
     handleSubmit,
@@ -26,8 +18,10 @@ const Signup = () => {
     resolver: zodResolver(signupSchema),
   });
 
+  const { mutate, isPending } = useSignupUser();
+
   const onSubmit: SubmitHandler<ISignUp> = (values: ISignUp) => {
-    console.log(values);
+    mutate(values);
     reset();
   };
   return (
@@ -41,30 +35,30 @@ const Signup = () => {
       <FormControl>
         <FormLabel htmlFor="email">Email</FormLabel>
         <Input id="email" placeholder="Enter Email" {...register('email')} />
-        <FormErrorMessage>{errors.email && errors.email.message}</FormErrorMessage>
+        <span style={{ color: 'red' }}>{errors.email && errors.email.message}</span>
       </FormControl>
       <FormControl>
         <FormLabel htmlFor="first_name">First name</FormLabel>
         <Input id="first_name" placeholder="Enter First Name" {...register('first_name')} />
-        <FormErrorMessage>{errors.first_name && errors.first_name.message}</FormErrorMessage>
+        <span style={{ color: 'red' }}>{errors.first_name && errors.first_name.message}</span>
       </FormControl>
       <FormControl>
         <FormLabel htmlFor="last_name">Last name</FormLabel>
         <Input id="last_name" placeholder="Enter Last Name" {...register('last_name')} />
-        <FormErrorMessage>{errors.last_name && errors.last_name.message}</FormErrorMessage>
+        <span style={{ color: 'red' }}>{errors.last_name && errors.last_name.message}</span>
       </FormControl>
       <FormControl>
         <FormLabel htmlFor="username">User Name</FormLabel>
         <Input id="username" placeholder="Enter User Name" {...register('username')} />
-        <FormErrorMessage>{errors.username && errors.username.message}</FormErrorMessage>
+        <span style={{ color: 'red' }}>{errors.username && errors.username.message}</span>
       </FormControl>
       <FormControl>
         <FormLabel htmlFor="password">Password</FormLabel>
         <Input id="password" placeholder="Enter Password" {...register('password')} />
-        <FormErrorMessage>{errors.password && errors.password.message}</FormErrorMessage>
+        <span style={{ color: 'red' }}>{errors.password && errors.password.message}</span>
       </FormControl>
       <Button mt={4} variant="solid" isLoading={isSubmitting} type="submit">
-        Submit
+        {isPending ? 'Loading' : 'Submit'}
       </Button>
     </form>
   );

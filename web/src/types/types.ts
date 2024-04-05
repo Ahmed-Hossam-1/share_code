@@ -1,5 +1,5 @@
 export interface User {
-  id: string;
+  id?: string;
   first_name: string;
   last_name: string;
   username: string;
@@ -29,5 +29,5 @@ export interface Comment {
 }
 
 export interface jwtType {
-  userId: string;
+  jwt: string;
 }

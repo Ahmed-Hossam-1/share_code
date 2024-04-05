@@ -1,7 +1,8 @@
+import PostCard from '../components/PostCard';
 import { usePosts } from '../services/queries';
 
 const Home = () => {
-  const { data, isLoading, isError } = usePosts();
+  const { data, isLoading, isError, refetch } = usePosts();
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -13,10 +14,7 @@ const Home = () => {
   return (
     <div>
       {data?.posts.map(post => (
-        <div key={post.id}>
-          <h1>{post.title}</h1>
-          <p>{post.url}</p>
-        </div>
+        <PostCard key={post.id} post={post} refetch={refetch} />
       ))}
     </div>
   );
