@@ -18,7 +18,8 @@ const Signup = () => {
     resolver: zodResolver(signupSchema),
   });
 
-  const { mutate, isPending } = useSignupUser();
+  const { mutate, isPending, data: user } = useSignupUser();
+  console.log(user);
 
   const onSubmit: SubmitHandler<ISignUp> = (values: ISignUp) => {
     mutate(values);

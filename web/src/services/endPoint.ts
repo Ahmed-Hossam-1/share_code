@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { ListPostResponse, SignInRequest, SignInResponse } from '../types/api';
-import { jwtType, User } from '../types/types';
+import { ListPostResponse, SignInRequest, SignInResponse, SignUpResponse } from '../types/api';
+import { User } from '../types/types';
 // import { Post } from '../types/types';
 import Cookies from 'js-cookie';
 
@@ -12,14 +12,27 @@ export const getPosts = async () => {
   return data.data;
 };
 
+export const getCurrentUser = async (id: string) => {
+  const data = await axiosInstance.get<User>(`/api/auth/user/${id}`);
+  return data.data;
+};
+
+// auth
 export const signupUser = async (userData: User) => {
-  const data = await axiosInstance.post<jwtType>('api/auth/signup', userData);
+  const data = await axiosInstance.post<SignUpResponse>('/api/auth/signup', userData);
   Cookies.set('jwt', data.data.jwt ?? '', { expires: 7 });
+  Cookies.set('userId', data.data.user.id ?? '', { expires: 7 });
   return data.data;
 };
 
 export const signinUser = async (userData: SignInRequest) => {
-  const data = await axiosInstance.post<SignInResponse>('api/auth/signin', userData);
+  const data = await axiosInstance.post<SignInResponse>('/api/auth/signin', userData);
   Cookies.set('jwt', data.data.jwt ?? '', { expires: 7 });
+  Cookies.set('userId', data.data.user.id ?? '', { expires: 7 });
   return data.data;
+};
+
+export const logout = () => {
+  Cookies.remove('jwt');
+  Cookies.remove('userId');
 };

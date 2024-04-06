@@ -1,7 +1,14 @@
 import { createJwt } from '../auth';
 import { db } from '../datastore';
-import { SignInRequest, SignInResponse, SignUpRequest, SignUpResponse } from '../types/api';
-import { ExpressHandler, User } from '../types/types';
+import {
+  GetCurrentUserRequest,
+  GetCurrentUserResponse,
+  SignInRequest,
+  SignInResponse,
+  SignUpRequest,
+  SignUpResponse,
+} from '../types/api';
+import { ExpressHandler, ExpressHandlerWithParams, User } from '../types/types';
 import crypto from 'crypto';
 import { passwordHash } from '../utils/passwordHash';
 
@@ -27,7 +34,16 @@ export const signUpUser: ExpressHandler<SignUpRequest, SignUpResponse> = async (
 
   await db.createUser(newUser);
   const jwt = await createJwt({ userId: newUser.id });
-  res.status(201).send({ jwt });
+  res.status(201).send({
+    user: {
+      id: newUser.id,
+      email: newUser.email,
+      first_name: newUser.first_name,
+      last_name: newUser.last_name,
+      username: newUser.username,
+    },
+    jwt,
+  });
 };
 
 export const signInUser: ExpressHandler<SignInRequest, SignInResponse> = async (req, res) => {
@@ -54,5 +70,26 @@ export const signInUser: ExpressHandler<SignInRequest, SignInResponse> = async (
       email: existing.email,
     },
     jwt: jwt,
+  });
+};
+
+export const getCurrent: ExpressHandlerWithParams<
+  { userId: string },
+  GetCurrentUserRequest,
+  GetCurrentUserResponse
+> = async (req, res) => {
+  const userId = req.params.userId;
+  if (!userId) return res.status(400).send({ error: 'ID MISSING' });
+  const user = await db.getUserById(userId);
+  if (!user) {
+    return res.sendStatus(500);
+  }
+
+  return res.send({
+    id: user.id,
+    first_name: user.username,
+    last_name: user.last_name,
+    username: user.username,
+    email: user.email,
   });
 };

@@ -25,11 +25,17 @@ export interface ListCommentsResponse {
 export type DeleteCommentResponse = {};
 export type DeleteCommentRequest = {};
 // users
+export type GetCurrentUserRequest = Pick<User, 'id'>;
+export type GetCurrentUserResponse = Pick<
+  User,
+  'id' | 'first_name' | 'last_name' | 'username' | 'email'
+>;
 export type SignUpRequest = Pick<
   User,
   'first_name' | 'last_name' | 'username' | 'email' | 'password'
 >;
 export interface SignUpResponse {
+  user: Pick<User, 'first_name' | 'last_name' | 'username' | 'email' | 'id'>;
   jwt: string;
 }
 export interface SignInRequest {
