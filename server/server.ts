@@ -6,6 +6,7 @@ import { authRouter } from './src/routes/auth.route';
 import { postRouter } from './src/routes/post.route';
 import { commmentRouter } from './src/routes/comments.route';
 import cors from 'cors';
+import { likeRouter } from './src/routes/like.route';
 
 (async () => {
   await initDb();
@@ -18,6 +19,7 @@ import cors from 'cors';
   app.use('/api/auth', authRouter);
   app.use('/api/posts', postRouter);
   app.use('/api/comments', commmentRouter);
+  app.use('/api/likes', likeRouter);
 
   app.use(errHandler);
 

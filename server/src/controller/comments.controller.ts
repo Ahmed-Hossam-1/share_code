@@ -1,5 +1,6 @@
 import { db } from '../datastore';
 import {
+  CountCommentsResponse,
   CreateCommentRequest,
   CreateCommentResponse,
   DeleteCommentResponse,
@@ -52,4 +53,16 @@ export const deleteComment: ExpressHandlerWithParams<
   if (!req.params.commentId) return res.status(404).send({ error: 'COMMENT ID MISSING' });
   await db.deleteComment(req.params.commentId);
   return res.sendStatus(200);
+};
+
+export const countComments: ExpressHandlerWithParams<
+  { postId: string },
+  null,
+  CountCommentsResponse
+> = async (req, res) => {
+  if (!req.params.postId) {
+    return res.status(400).send({ error: 'POST ID MISSING' });
+  }
+  const count = await db.countComments(req.params.postId);
+  return res.send({ count });
 };

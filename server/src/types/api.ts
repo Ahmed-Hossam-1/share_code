@@ -37,3 +37,7 @@ export type SignInResponse = {
   user: Pick<User, 'first_name' | 'last_name' | 'username' | 'email' | 'id'>;
   jwt: string;
 };
+// likes
+export interface ListLikesResponse {
+  likes: Number;
+}
