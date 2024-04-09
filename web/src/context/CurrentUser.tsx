@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, ReactNode, useContext, useState } from 'react';
-import Cookies from 'js-cookie';
-import { getCurrentUser } from '../services/endPoint';
+import { createContext, ReactNode, useContext } from 'react';
+import { getCurrentUser, isLoggedIn } from '../services/endPoint';
 import { useQuery } from '@tanstack/react-query';
 import { User } from '../types/types';
 
 type UserContext = {
-  userID?: string;
-  jwt: string;
+  // jwt: string | null;
   currentUser: User | undefined;
+  refetchCurrentUser: () => void;
 };
 
 type CurrentUserContextProviderProps = {
@@ -21,15 +20,16 @@ export const userContext = createContext({} as UserContext);
 export const CurrentUserContextProvider = ({
   children,
 }: CurrentUserContextProviderProps): JSX.Element => {
-  const [userId, setUserId] = useState(Cookies.get('userId') || '');
-  const [jwt, setJwt] = useState(Cookies.get('jwt') || '');
+  // const user = Cookies.get('jwt');
+  // const [jwt, _] = useState<string | null>(user ? user : null);
 
-  const { data: currentUser } = useQuery({
+  const { data: currentUser, refetch: refetchCurrentUser } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => getCurrentUser(userId),
+    queryFn: getCurrentUser,
+    enabled: isLoggedIn(),
   });
   return (
-    <userContext.Provider value={{ userID: userId, jwt, currentUser }}>
+    <userContext.Provider value={{ currentUser, refetchCurrentUser }}>
       {children}
     </userContext.Provider>
   );

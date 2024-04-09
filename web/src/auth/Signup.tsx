@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { FormLabel, FormControl, Input, Button } from '@chakra-ui/react';
@@ -5,6 +6,10 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signupSchema } from '../utils/validations';
 import { useSignupUser } from '../services/mutations';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useCurrentUser } from '../context/CurrentUser';
+import { isLoggedIn } from '../services/endPoint';
 
 const Signup = () => {
   type ISignUp = z.infer<typeof signupSchema>;
@@ -17,14 +22,19 @@ const Signup = () => {
     mode: 'onChange',
     resolver: zodResolver(signupSchema),
   });
-
-  const { mutate, isPending, data: user } = useSignupUser();
-  console.log(user);
-
+  const { refetchCurrentUser } = useCurrentUser();
+  const { mutate, isPending } = useSignupUser();
+  const nav = useNavigate();
   const onSubmit: SubmitHandler<ISignUp> = (values: ISignUp) => {
     mutate(values);
+    refetchCurrentUser();
     reset();
   };
+
+  useEffect(() => {
+    isLoggedIn() && nav('/');
+  }, [nav]);
+
   return (
     <form
       style={{

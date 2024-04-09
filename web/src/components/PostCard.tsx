@@ -7,7 +7,7 @@ const PostCard: FC<{ post: Post; refetch: () => unknown; hideDiscuss?: boolean }
   refetch,
   hideDiscuss,
 }) => {
-  return <></>;
+  return <div>posts</div>;
 };
 
 export default PostCard;

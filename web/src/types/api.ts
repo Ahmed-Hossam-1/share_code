@@ -30,10 +30,7 @@ export type GetCurrentUserResponse = Pick<
   User,
   'id' | 'first_name' | 'last_name' | 'username' | 'email'
 >;
-export type SignUpRequest = Pick<
-  User,
-  'first_name' | 'last_name' | 'username' | 'email' | 'password'
->;
+export type SignUpRequest = Pick<User, 'first_name' | 'last_name' | 'username' | 'email'>;
 export interface SignUpResponse {
   user: Pick<User, 'first_name' | 'last_name' | 'username' | 'email' | 'id'>;
   jwt: string;

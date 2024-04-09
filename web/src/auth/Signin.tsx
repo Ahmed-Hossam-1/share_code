@@ -1,10 +1,15 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { FormLabel, FormControl, Input, Button } from '@chakra-ui/react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useSigninUser } from '../services/mutations';
+// import { useSigninUser } from '../services/mutations';
 import { signinSchema } from '../utils/validations';
+import { useNavigate } from 'react-router-dom';
+import { useCurrentUser } from '../context/CurrentUser';
+import { useEffect } from 'react';
+import { isLoggedIn, signinUser } from '../services/endPoint';
 
 const Signin = () => {
   type ISignIn = z.infer<typeof signinSchema>;
@@ -18,14 +23,18 @@ const Signin = () => {
     resolver: zodResolver(signinSchema),
   });
 
-  const { mutate, isPending, data } = useSigninUser();
-
-  console.log(data?.user);
-
-  const onSubmit: SubmitHandler<ISignIn> = (values: ISignIn) => {
-    mutate(values);
+  // const { mutate, isPending } = useSigninUser();
+  const { refetchCurrentUser } = useCurrentUser();
+  const nav = useNavigate();
+  const onSubmit: SubmitHandler<ISignIn> = async (values: ISignIn) => {
+    await signinUser(values);
+    refetchCurrentUser();
     reset();
   };
+
+  useEffect(() => {
+    isLoggedIn() && nav('/');
+  }, [nav, isLoggedIn, refetchCurrentUser]);
 
   return (
     <form
@@ -46,7 +55,7 @@ const Signin = () => {
         <span style={{ color: 'red' }}>{errors.password && errors.password.message}</span>
       </FormControl>
       <Button mt={4} variant="solid" isLoading={isSubmitting} type="submit">
-        {isPending ? 'loading...' : 'Submit'}
+        Submit
       </Button>
     </form>
   );

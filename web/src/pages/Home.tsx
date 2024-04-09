@@ -1,12 +1,9 @@
 import PostCard from '../components/PostCard';
 import { usePosts } from '../services/queries';
-import { useCurrentUser } from '../context/CurrentUser';
 
 const Home = () => {
   const { data, isLoading, isError, refetch } = usePosts();
-  const { currentUser } = useCurrentUser();
 
-  console.log(currentUser);
   if (isLoading) {
     return <div>Loading...</div>;
   }

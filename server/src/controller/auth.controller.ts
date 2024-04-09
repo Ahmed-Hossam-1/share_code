@@ -8,7 +8,7 @@ import {
   SignUpRequest,
   SignUpResponse,
 } from '../types/api';
-import { ExpressHandler, ExpressHandlerWithParams, User } from '../types/types';
+import { ExpressHandler, User } from '../types/types';
 import crypto from 'crypto';
 import { passwordHash } from '../utils/passwordHash';
 
@@ -73,14 +73,13 @@ export const signInUser: ExpressHandler<SignInRequest, SignInResponse> = async (
   });
 };
 
-export const getCurrent: ExpressHandlerWithParams<
-  { userId: string },
-  GetCurrentUserRequest,
-  GetCurrentUserResponse
-> = async (req, res) => {
-  const userId = req.params.userId;
-  if (!userId) return res.status(400).send({ error: 'ID MISSING' });
-  const user = await db.getUserById(userId);
+export const getCurrent: ExpressHandler<GetCurrentUserRequest, GetCurrentUserResponse> = async (
+  __,
+  res
+) => {
+  // const userId = res.locals.userId;
+  // if (!userId) return res.status(400).send({ error: 'ID MISSING' });
+  const user = await db.getUserById(res.locals.userId);
   if (!user) {
     return res.sendStatus(500);
   }
@@ -93,3 +92,4 @@ export const getCurrent: ExpressHandlerWithParams<
     email: user.email,
   });
 };
+// res.locals.userId
