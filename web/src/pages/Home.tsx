@@ -3,7 +3,6 @@ import { usePosts } from '../services/queries';
 
 const Home = () => {
   const { data, isLoading, isError, refetch } = usePosts();
-
   if (isLoading) {
     return <div>Loading...</div>;
   }

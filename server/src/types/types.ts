@@ -14,6 +14,7 @@ export interface Post {
   url: string;
   userId: string;
   postedAt: number;
+  liked?: boolean;
 }
 
 export interface Like {
@@ -27,6 +28,7 @@ export interface Comment {
   postId: string;
   comment: string;
   postedAt: number;
+  liked?: boolean;
 }
 
 export type withError<T> = T & { error: string };

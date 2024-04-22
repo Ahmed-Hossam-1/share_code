@@ -9,7 +9,6 @@ import { useSignupUser } from '../services/mutations';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useCurrentUser } from '../context/CurrentUser';
-import { isLoggedIn } from '../services/endPoint';
 
 const Signup = () => {
   type ISignUp = z.infer<typeof signupSchema>;
@@ -23,7 +22,7 @@ const Signup = () => {
     resolver: zodResolver(signupSchema),
   });
   const { refetchCurrentUser } = useCurrentUser();
-  const { mutate, isPending } = useSignupUser();
+  const { mutate, isPending, data: user } = useSignupUser();
   const nav = useNavigate();
   const onSubmit: SubmitHandler<ISignUp> = (values: ISignUp) => {
     mutate(values);
@@ -32,8 +31,8 @@ const Signup = () => {
   };
 
   useEffect(() => {
-    isLoggedIn() && nav('/');
-  }, [nav]);
+    user && nav('/');
+  }, [nav, user]);
 
   return (
     <form

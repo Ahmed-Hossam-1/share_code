@@ -12,6 +12,11 @@ export const getPosts = async () => {
   return data.data;
 };
 
+export const getUser = async (id: string) => {
+  const data = await axiosInstance.get<User>(`/api/auth/user/${id}`);
+  return data.data;
+};
+
 export const getCurrentUser = async () => {
   const data = await axiosInstance.get<User>(`/api/auth/user`, {
     headers: {
@@ -46,4 +51,26 @@ export const getJWT = (): string => {
 export const isLoggedIn = (): boolean => {
   const jwt = getJWT();
   return !!jwt;
+};
+
+export const countComments = async (id: string) => {
+  const data = await axiosInstance.get<{ count: number }>(`/api/comments/${id}/count`);
+  return data.data;
+};
+
+// LIKES
+export const createLike = async (postId: string) => {
+  console.log(Cookies.get('jwt'), 'jdiffffffffffff', postId);
+  const data = await axiosInstance.get(`/api/likes/${postId}`, {
+    headers: {
+      Authorization: 'Bearer ' + Cookies.get('jwt'),
+      Accept: 'application/json',
+    },
+  });
+  return data.data;
+};
+
+export const deleteLike = async (postId: string) => {
+  const data = await axiosInstance.delete(`/api/likes/${postId}`);
+  return data.data;
 };

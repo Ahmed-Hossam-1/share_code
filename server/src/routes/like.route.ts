@@ -1,6 +1,8 @@
 import express from 'express';
 import { countLike, createLike, deleteLike } from '../controller/like.controller';
+import { authMiddleware } from '../middleware/authMiddleware';
 
 export const likeRouter = express.Router();
 
-likeRouter.route('/:postId').post(createLike).get(countLike).delete(deleteLike);
+likeRouter.route('/:postId').get(authMiddleware, createLike).delete(deleteLike);
+likeRouter.route('/:postId/count').get(countLike);

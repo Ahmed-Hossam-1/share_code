@@ -42,8 +42,17 @@ export class SqlDataStore implements DataStore {
     return this.db.get<User>(`SELECT * FROM users WHERE username = ?`, username);
   }
 
-  listPosts(): Promise<Post[]> {
-    return this.db.all<Post[]>('SELECT * FROM posts');
+  // listPosts(): Promise<Post[]> {
+  //   return this.db.all<Post[]>('SELECT * FROM posts');
+  // }
+
+  listPosts(userId?: string): Promise<Post[]> {
+    return this.db.all<Post[]>(
+      `SELECT *, EXISTS(
+        SELECT 1 FROM likes WHERE likes.postId = posts.id AND likes.userId = ?
+      ) as liked FROM posts ORDER BY postedAt DESC`,
+      userId
+    );
   }
 
   async createPost(_post: Post): Promise<void> {
@@ -61,8 +70,19 @@ export class SqlDataStore implements DataStore {
     return this.db.get<User>(`SELECT * FROM users WHERE id = ?`, id);
   }
 
-  getPost(id: string): Promise<Post | undefined> {
-    return this.db.get<Post>(`SELECT * FROM posts WHERE id = ?`, id);
+  // getPost(id: string): Promise<Post | undefined> {
+  //   return this.db.get<Post>(`SELECT * FROM posts WHERE id = ?`, id);
+  // }
+
+  async getPost(id: string, userId: string): Promise<Post | undefined> {
+    return await this.db.get<Post>(
+      `SELECT *, EXISTS(
+        SELECT 1 FROM likes WHERE likes.postId = ? AND likes.userId = ?
+      ) as liked FROM posts WHERE id = ?`,
+      id,
+      userId,
+      id
+    );
   }
 
   async deletePost(id: string): Promise<void> {
@@ -117,6 +137,16 @@ export class SqlDataStore implements DataStore {
       postId
     );
     return result?.count ?? 0;
+  }
+
+  async exists(like: Like): Promise<boolean> {
+    let awaitResult = await this.db.get<number>(
+      'SELECT 1 FROM likes WHERE postId = ? and userId = ?',
+      like.postId,
+      like.userId
+    );
+    let val: boolean = awaitResult === undefined ? false : true;
+    return val;
   }
 }
 

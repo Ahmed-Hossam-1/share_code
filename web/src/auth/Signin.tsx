@@ -4,12 +4,11 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { FormLabel, FormControl, Input, Button } from '@chakra-ui/react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-// import { useSigninUser } from '../services/mutations';
 import { signinSchema } from '../utils/validations';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentUser } from '../context/CurrentUser';
 import { useEffect } from 'react';
-import { isLoggedIn, signinUser } from '../services/endPoint';
+import { useSigninUser } from '../services/mutations';
 
 const Signin = () => {
   type ISignIn = z.infer<typeof signinSchema>;
@@ -23,18 +22,18 @@ const Signin = () => {
     resolver: zodResolver(signinSchema),
   });
 
-  // const { mutate, isPending } = useSigninUser();
+  const { mutate, data: user } = useSigninUser();
   const { refetchCurrentUser } = useCurrentUser();
   const nav = useNavigate();
   const onSubmit: SubmitHandler<ISignIn> = async (values: ISignIn) => {
-    await signinUser(values);
+    await mutate(values);
     refetchCurrentUser();
     reset();
   };
 
   useEffect(() => {
-    isLoggedIn() && nav('/');
-  }, [nav, isLoggedIn, refetchCurrentUser]);
+    user && nav('/');
+  }, [nav, user, refetchCurrentUser]);
 
   return (
     <form

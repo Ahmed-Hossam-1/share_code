@@ -10,8 +10,9 @@ export interface Post {
   id: string;
   title: string;
   url: string;
-  userId: string;
+  user_id: string;
   postedAt: number;
+  liked?: boolean;
 }
 
 export interface Like {
@@ -25,6 +26,7 @@ export interface Comment {
   postId: string;
   comment: string;
   postedAt: number;
+  liked?: boolean;
 }
 
 export interface jwtType {

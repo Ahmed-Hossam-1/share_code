@@ -2,29 +2,42 @@ import { db } from '../datastore';
 import { ListLikesResponse } from '../types/api';
 import { ExpressHandlerWithParams, Like } from '../types/types';
 
-export const createLike: ExpressHandlerWithParams<{ postId: string }, { userId: string }, {}> = (
-  req,
-  res
-) => {
+export const createLike = async (req: any, res: any) => {
   const { postId } = req.params;
-  const { userId } = req.body;
+  const userId = res.locals.userId;
   if (!postId) return res.sendStatus(400);
   if (!userId) return res.sendStatus(400);
+  const getPost = await db.getPost(req.params.postId);
+  if (!getPost) {
+    return res.status(404).send({ error: 'ERRORS.POST_NOT_FOUND' });
+  }
+
+  let found = await db.exists({
+    postId: req.params.postId,
+    userId: res.locals.userId,
+  });
+
+  if (found) {
+    return res.status(400).send({ error: 'ERRORS.DUPLICATE_LIKE' });
+  }
+
   const insertLike: Like = {
     postId,
     userId,
   };
+
+  getPost.liked = true;
+  console.log(getPost.liked + 'liked');
   db.createLike(insertLike);
-  res.sendStatus(200);
+  res.status(200).send({ like: insertLike });
 };
 
-export const deleteLike: ExpressHandlerWithParams<
-  { postId: string },
-  { userId: string },
-  {}
-> = async (req, res) => {
+export const deleteLike: ExpressHandlerWithParams<{ postId: string }, null, {}> = async (
+  req,
+  res
+) => {
   const { postId } = req.params;
-  const { userId } = req.body;
+  const userId = res.locals.userId;
   if (!postId) return res.sendStatus(400);
   if (!userId) return res.sendStatus(400);
 
@@ -35,6 +48,8 @@ export const deleteLike: ExpressHandlerWithParams<
     postId,
     userId,
   };
+
+  existpost.liked = false;
   db.deleteLike(deleteLike);
   res.sendStatus(200);
 };

@@ -6,7 +6,6 @@ import { useQuery } from '@tanstack/react-query';
 import { User } from '../types/types';
 
 type UserContext = {
-  // jwt: string | null;
   currentUser: User | undefined;
   refetchCurrentUser: () => void;
 };
@@ -20,9 +19,6 @@ export const userContext = createContext({} as UserContext);
 export const CurrentUserContextProvider = ({
   children,
 }: CurrentUserContextProviderProps): JSX.Element => {
-  // const user = Cookies.get('jwt');
-  // const [jwt, _] = useState<string | null>(user ? user : null);
-
   const { data: currentUser, refetch: refetchCurrentUser } = useQuery({
     queryKey: ['currentUser'],
     queryFn: getCurrentUser,

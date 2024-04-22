@@ -3,12 +3,14 @@ import { db } from '../datastore';
 import {
   GetCurrentUserRequest,
   GetCurrentUserResponse,
+  GetUserRequest,
+  GetUserResponse,
   SignInRequest,
   SignInResponse,
   SignUpRequest,
   SignUpResponse,
 } from '../types/api';
-import { ExpressHandler, User } from '../types/types';
+import { ExpressHandler, ExpressHandlerWithParams, User } from '../types/types';
 import crypto from 'crypto';
 import { passwordHash } from '../utils/passwordHash';
 
@@ -92,4 +94,23 @@ export const getCurrent: ExpressHandler<GetCurrentUserRequest, GetCurrentUserRes
     email: user.email,
   });
 };
-// res.locals.userId
+
+export const getUser: ExpressHandlerWithParams<
+  { id: string },
+  GetUserRequest,
+  GetUserResponse
+> = async (req, res) => {
+  const { id } = req.params;
+  if (!id) return res.sendStatus(400);
+
+  const user = await db.getUserById(id);
+  if (!user) {
+    return res.sendStatus(404);
+  }
+  return res.send({
+    id: user.id,
+    first_name: user.first_name,
+    last_name: user.last_name,
+    username: user.username,
+  });
+};

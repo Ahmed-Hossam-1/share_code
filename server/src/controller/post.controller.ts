@@ -11,22 +11,24 @@ import {
 import { ExpressHandler, Post } from '../types/types';
 
 export const listPosts: ExpressHandler<ListPostRequest, ListPostResponse> = async (__, res) => {
-  // const userId = res.locals.us;
-  res.send({ posts: await db.listPosts() } as ListPostResponse);
+  const userId: string = res.locals.userId;
+  // if (!userId) return res.sendStatus(401);
+  const postDB = await db.listPosts(userId);
+  res.send({ posts: postDB });
 };
 
 export const createPost: ExpressHandler<CreatePostRequest, CreatePostResponse> = async (
   req,
   res
 ) => {
-  if (!req.body?.title || !req.body?.url) {
+  if (!req.body?.title || !req.body?.url || !req.body?.userId) {
     return res.sendStatus(400);
   }
   const newPost: Post = {
     id: crypto.randomUUID(),
     title: req.body.title,
     url: req.body.url,
-    userId: res.locals.userId,
+    userId: req.body.userId,
     postedAt: Date.now(),
   };
 
@@ -40,7 +42,7 @@ export const singlePost = async (req: any, res: any) => {
   if (!postId) {
     return res.sendStatus(400);
   }
-  const post: any = await db.getPost(postId);
+  const post: any = await db.getPost(postId, res.locals.userId);
   if (!post) {
     return res.sendStatus(404);
   }
