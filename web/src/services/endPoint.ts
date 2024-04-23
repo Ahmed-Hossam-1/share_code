@@ -2,13 +2,19 @@
 import axios from 'axios';
 import { ListPostResponse, SignInRequest, SignInResponse, SignUpResponse } from '../types/api';
 import { User } from '../types/types';
-// import { Post } from '../types/types';
 import Cookies from 'js-cookie';
+// import { Post } from '../types/types';
 
 const BASE_URL = 'http://localhost:3000';
+
 const axiosInstance = axios.create({ baseURL: BASE_URL });
 export const getPosts = async () => {
-  const data = await axiosInstance.get<ListPostResponse>('/api/posts');
+  const data = await axiosInstance.get<ListPostResponse>('/api/posts', {
+    headers: {
+      Authorization: 'Bearer ' + Cookies.get('jwt'),
+      Accept: 'application/json',
+    },
+  });
   return data.data;
 };
 
@@ -58,9 +64,8 @@ export const countComments = async (id: string) => {
   return data.data;
 };
 
-// LIKES
+// Likes
 export const createLike = async (postId: string) => {
-  console.log(Cookies.get('jwt'), 'jdiffffffffffff', postId);
   const data = await axiosInstance.get(`/api/likes/${postId}`, {
     headers: {
       Authorization: 'Bearer ' + Cookies.get('jwt'),
@@ -71,6 +76,16 @@ export const createLike = async (postId: string) => {
 };
 
 export const deleteLike = async (postId: string) => {
-  const data = await axiosInstance.delete(`/api/likes/${postId}`);
+  const data = await axiosInstance.delete(`/api/likes/${postId}`, {
+    headers: {
+      Authorization: 'Bearer ' + Cookies.get('jwt'),
+      Accept: 'application/json',
+    },
+  });
+  return data.data;
+};
+
+export const countLike = async (postId: string) => {
+  const data = await axiosInstance.get(`/api/likes/${postId}/count`);
   return data.data;
 };

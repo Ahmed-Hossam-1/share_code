@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { formatDistance } from 'date-fns/formatDistance';
 import { useQuery } from '@tanstack/react-query';
 import { countComments, createLike, deleteLike, getUser } from '../services/endPoint';
+// import { useCountLike } from '../services/queries';
 
 const PostCard: FC<{ post: Post; refetch: () => unknown; hideDiscuss?: boolean }> = ({
   post,
@@ -15,27 +16,28 @@ const PostCard: FC<{ post: Post; refetch: () => unknown; hideDiscuss?: boolean }
   hideDiscuss,
 }) => {
   const { id, title, url: postUrl, user_id, liked } = post;
+
   console.log(liked);
+
   const { user, error, isLoading } = useGetUser(user_id);
   const { countCommentsRes } = useCountComments(id);
+  // const { data: countLike } = useCountLike(id);
 
   const userName = isLoading || !user ? '...' : error ? '<unknown>' : user.username;
   const commentsCount = countCommentsRes?.count ?? 0;
   const urlWithProtocol = postUrl.startsWith('http') ? postUrl : 'http://' + postUrl;
 
-  const toggleLike = useCallback(async (postId: string, like: boolean) => {
-    console.log(like, 'done', postId);
-    try {
+  const toggleLike = useCallback(
+    async (postId: string, like: boolean) => {
       if (like) {
         await createLike(postId);
       } else {
         await deleteLike(postId);
       }
       refetch();
-    } catch (error) {
-      console.error('An error occurred while toggling like:', error);
-    }
-  }, []);
+    },
+    [refetch, liked]
+  );
 
   return (
     <Flex m={4} gap={2} align="baseline">
@@ -48,6 +50,7 @@ const PostCard: FC<{ post: Post; refetch: () => unknown; hideDiscuss?: boolean }
           cursor="pointer"
           _hover={{ fill: 'brown' }}
         />
+        {/* <span>{countLike?.likes}</span> */}
       </Box>
 
       <Box>
@@ -105,6 +108,7 @@ const getUrlDomain = (url: string): string => {
     return url;
   }
 };
+
 const useGetUser = (id: string) => {
   const {
     data: user,
