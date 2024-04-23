@@ -5,6 +5,7 @@ import { ExpressHandlerWithParams, Like } from '../types/types';
 export const createLike = async (req: any, res: any) => {
   const { postId } = req.params;
   const userId = res.locals.userId;
+
   if (!postId) return res.sendStatus(400);
   if (!userId) return res.sendStatus(400);
   const getPost = await db.getPost(req.params.postId);
@@ -26,16 +27,12 @@ export const createLike = async (req: any, res: any) => {
     userId,
   };
 
-  getPost.liked = true;
   console.log(getPost.liked + 'liked');
   db.createLike(insertLike);
   res.status(200).send({ like: insertLike });
 };
 
-export const deleteLike: ExpressHandlerWithParams<{ postId: string }, null, {}> = async (
-  req,
-  res
-) => {
+export const deleteLike = async (req: any, res: any) => {
   const { postId } = req.params;
   const userId = res.locals.userId;
   if (!postId) return res.sendStatus(400);

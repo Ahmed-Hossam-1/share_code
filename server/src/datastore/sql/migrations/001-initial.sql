@@ -13,7 +13,6 @@ CREATE TABLE posts (
     url         VARCHAR UNIQUE NOT NULL,
     user_id     VARCHAR NOT NULL,
     postedAt    INTEGER NOT NULL,
-    liked       INTEGER,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 

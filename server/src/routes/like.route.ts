@@ -4,5 +4,5 @@ import { authMiddleware } from '../middleware/authMiddleware';
 
 export const likeRouter = express.Router();
 
-likeRouter.route('/:postId').get(authMiddleware, createLike).delete(deleteLike);
+likeRouter.route('/:postId').get(authMiddleware, createLike).delete(authMiddleware, deleteLike);
 likeRouter.route('/:postId/count').get(countLike);
