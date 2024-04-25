@@ -13,3 +13,8 @@ export const signinSchema = z.object({
 
   password: z.string().min(6, { message: 'password mast be at least 6 char' }),
 });
+
+export const newPostSchema = z.object({
+  url: z.string().min(1).url({ message: 'url is required' }),
+  title: z.string().min(6, { message: 'title is required' }),
+});

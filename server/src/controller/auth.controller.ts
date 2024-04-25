@@ -7,15 +7,14 @@ import {
   GetUserResponse,
   SignInRequest,
   SignInResponse,
-  SignUpRequest,
-  SignUpResponse,
 } from '../types/api';
 import { ExpressHandler, ExpressHandlerWithParams, User } from '../types/types';
 import crypto from 'crypto';
 import { passwordHash } from '../utils/passwordHash';
 
-export const signUpUser: ExpressHandler<SignUpRequest, SignUpResponse> = async (req, res) => {
+export const signUpUser = async (req: any, res: any) => {
   const { email, first_name, last_name, password, username } = req.body;
+  console.log(email, last_name, first_name, password, username, 'fffffffffffffff');
   if (!email || !first_name || !last_name || !password || !username) {
     return res.status(400).send({ error: 'All fields are required' });
   }
@@ -27,11 +26,12 @@ export const signUpUser: ExpressHandler<SignUpRequest, SignUpResponse> = async (
 
   const newUser: User = {
     id: crypto.randomUUID(),
-    email,
-    first_name,
-    last_name,
+    email: email,
+    first_name: first_name,
+    last_name: last_name,
     password: passwordHash(password),
-    username,
+    username: username,
+    avatar: req.file.filename,
   };
 
   await db.createUser(newUser);
@@ -43,6 +43,7 @@ export const signUpUser: ExpressHandler<SignUpRequest, SignUpResponse> = async (
       first_name: newUser.first_name,
       last_name: newUser.last_name,
       username: newUser.username,
+      avatar: req.file.filename,
     },
     jwt,
   });
@@ -79,8 +80,6 @@ export const getCurrent: ExpressHandler<GetCurrentUserRequest, GetCurrentUserRes
   __,
   res
 ) => {
-  // const userId = res.locals.userId;
-  // if (!userId) return res.status(400).send({ error: 'ID MISSING' });
   const user = await db.getUserById(res.locals.userId);
   if (!user) {
     return res.sendStatus(500);
@@ -92,6 +91,7 @@ export const getCurrent: ExpressHandler<GetCurrentUserRequest, GetCurrentUserRes
     last_name: user.last_name,
     username: user.username,
     email: user.email,
+    avatar: user.avatar,
   });
 };
 
@@ -112,5 +112,7 @@ export const getUser: ExpressHandlerWithParams<
     first_name: user.first_name,
     last_name: user.last_name,
     username: user.username,
+    email: user.email,
+    avatar: user.avatar,
   });
 };

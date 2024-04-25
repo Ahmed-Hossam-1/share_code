@@ -12,9 +12,9 @@ import { ExpressHandler, Post } from '../types/types';
 
 export const listPosts: ExpressHandler<ListPostRequest, ListPostResponse> = async (__, res) => {
   const userId: string = res.locals.userId;
-  console.log(userId, 'userId');
+  // console.log(userId, 'userId');
   if (!userId) return res.sendStatus(401);
-  const postDB = await db.listPosts(userId);
+  const postDB = await db.listPosts();
 
   res.send({ posts: postDB });
 };

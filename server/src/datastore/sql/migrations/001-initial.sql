@@ -5,6 +5,7 @@ CREATE TABLE users(
     username   VARCHAR UNIQUE NOT NULL,
     password   VARCHAR NOT NULL,
     email      VARCHAR UNIQUE NOT NULL
+    avatar     VARCHAR
 );
 
 CREATE TABLE posts (

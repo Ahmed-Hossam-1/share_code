@@ -5,9 +5,10 @@ import {
   deleteComment,
   listComments,
 } from '../controller/comments.controller';
+import { authMiddleware } from '../middleware/authMiddleware';
 
 export const commmentRouter = express.Router();
 
-commmentRouter.route('/:postId').post(createComments).get(listComments);
+commmentRouter.route('/:postId').post(authMiddleware, createComments).get(listComments);
 commmentRouter.route('/:commentId').delete(deleteComment);
 commmentRouter.route('/:postId/count').get(countComments);

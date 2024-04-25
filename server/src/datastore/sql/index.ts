@@ -24,13 +24,14 @@ export class SqlDataStore implements DataStore {
 
   async createUser(_user: User): Promise<void> {
     await this.db.run(
-      'INSERT INTO users (id,email,password,first_name,last_name,userName) VALUES (?,?,?,?,?,?)',
+      'INSERT INTO users (id,email,password,first_name,last_name,userName,avatar) VALUES (?,?,?,?,?,?,?)',
       _user.id,
       _user.email,
       _user.password,
       _user.first_name,
       _user.last_name,
-      _user.username
+      _user.username,
+      _user.avatar
     );
   }
 

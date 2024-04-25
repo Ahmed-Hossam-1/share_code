@@ -1,21 +1,13 @@
 import { db } from '../datastore';
-import {
-  CountCommentsResponse,
-  CreateCommentRequest,
-  CreateCommentResponse,
-  DeleteCommentResponse,
-  ListCommentsResponse,
-} from '../types/api';
+import { CountCommentsResponse, DeleteCommentResponse, ListCommentsResponse } from '../types/api';
 import { Comment, ExpressHandlerWithParams } from '../types/types';
 import crypto from 'crypto';
 
-export const createComments: ExpressHandlerWithParams<
-  { postId: string },
-  CreateCommentRequest,
-  CreateCommentResponse
-> = async (req, res) => {
+export const createComments = async (req: any, res: any) => {
+  const comment = req.body.comment;
+  console.log(comment, 'ccccccccommmmmeeennt');
   if (!req.params.postId) return res.status(400).send({ error: 'ID MISSING' });
-  if (!req.body.comment) return res.status(400).send({ error: 'COMMENTS MISSING' });
+  if (!comment) return res.status(400).send({ error: 'COMMENTS MISSING' });
 
   const existpost = await db.getPost(req.params.postId);
   if (!existpost) return res.status(400).send({ error: 'POST NOT FOUND' });
@@ -23,8 +15,8 @@ export const createComments: ExpressHandlerWithParams<
   const newComment: Comment = {
     id: crypto.randomUUID(),
     postId: req.params.postId,
-    userId: req.body.userId as string,
-    comment: req.body.comment,
+    userId: res.locals.userId,
+    comment: comment,
     postedAt: Date.now(),
   };
   console.log(newComment, 'commenst');

@@ -1,13 +1,33 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/rules-of-hooks */
 import axios from 'axios';
-import { ListPostResponse, SignInRequest, SignInResponse, SignUpResponse } from '../types/api';
-import { User } from '../types/types';
+import {
+  ListCommentsResponse,
+  ListPostResponse,
+  SignInRequest,
+  SignInResponse,
+  SignUpResponse,
+} from '../types/api';
+import { Post, TNewPost, User } from '../types/types';
 import Cookies from 'js-cookie';
 // import { Post } from '../types/types';
 
 const BASE_URL = 'http://localhost:3000';
 
 const axiosInstance = axios.create({ baseURL: BASE_URL });
+
+// posts
+export const createPosts = async (postData: TNewPost) => {
+  console.log(postData);
+  const data = await axiosInstance.post<TNewPost>('/api/posts', postData, {
+    headers: {
+      Authorization: 'Bearer ' + Cookies.get('jwt'),
+      Accept: 'application/json',
+    },
+  });
+  return data.data;
+};
+
 export const getPosts = async () => {
   const data = await axiosInstance.get<ListPostResponse>('/api/posts', {
     headers: {
@@ -18,7 +38,13 @@ export const getPosts = async () => {
   return data.data;
 };
 
-export const getUser = async (id: string) => {
+export const getSinglePost = async (postId: string) => {
+  const data = await axiosInstance.get<{ post: Post }>(`/api/posts/${postId}`);
+  return data.data;
+};
+
+// users
+export const getUser = async (id: string | undefined) => {
   const data = await axiosInstance.get<User>(`/api/auth/user/${id}`);
   return data.data;
 };
@@ -59,8 +85,34 @@ export const isLoggedIn = (): boolean => {
   return !!jwt;
 };
 
+// comments
 export const countComments = async (id: string) => {
   const data = await axiosInstance.get<{ count: number }>(`/api/comments/${id}/count`);
+  return data.data;
+};
+
+export const getComments = async (postId: string | undefined) => {
+  const data = await axiosInstance.get<ListCommentsResponse>(`/api/comments/${postId}`);
+  return data.data;
+};
+
+interface TcommentData {
+  postId: string | undefined;
+  comment: string;
+}
+
+export const createComment = async (commentData: TcommentData) => {
+  console.log(commentData, 'commentData');
+  const data = await axiosInstance.post<Comment>(
+    `/api/comments/${commentData.postId}`,
+    commentData.comment,
+    {
+      headers: {
+        Authorization: 'Bearer ' + Cookies.get('jwt'),
+        Accept: 'application/json',
+      },
+    }
+  );
   return data.data;
 };
 

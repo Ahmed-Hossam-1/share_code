@@ -7,11 +7,13 @@ import { postRouter } from './src/routes/post.route';
 import { commmentRouter } from './src/routes/comments.route';
 import cors from 'cors';
 import { likeRouter } from './src/routes/like.route';
+import path from 'path';
 
 (async () => {
   await initDb();
   dotenv.config();
   const app = express();
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
   app.use(cors()); // cors is a middleware
 
   app.use(express.json());

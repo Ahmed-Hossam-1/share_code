@@ -32,7 +32,7 @@ const Signin = () => {
   };
 
   useEffect(() => {
-    user && nav('/');
+    user && nav('/home');
   }, [nav, user, refetchCurrentUser]);
 
   return (

@@ -16,22 +16,31 @@ const NavBar = () => {
   }, [nav, refetchCurrentUser]);
 
   return (
-    <Flex py={4} px={20} pt={10} align="center" justify="space-between" h={16}>
+    <Flex py={10} px={20} mb={10} boxShadow="lg" align="center" justify="space-between" h={16}>
       <Link to={'/'}>
         <Image w={200} src="/images/logoin.png" />
       </Link>
       {isLoggedIn() ? (
         <Flex gap={5} align="center">
-          <Link to="">
+          <Link to="/new-post">
             <Button variant="solid" size="sm">
               New post
             </Button>
           </Link>
           {currentUser && (
-            <Link to="">
+            <Link className="profH" to={`/profile/${currentUser.id}`}>
               <Text fontSize="sm" color="gray.600">
                 {currentUser?.username ?? ''}
               </Text>
+              <img
+                src={`${
+                  currentUser?.avatar
+                    ? `http://localhost:3000/uploads/${currentUser?.avatar}`
+                    : '/images/non-photo.png'
+                }`}
+                className="avatarH"
+                alt="avatar"
+              />
             </Link>
           )}
           <Button onClick={handelLogout} size="sm" variant="ghost">

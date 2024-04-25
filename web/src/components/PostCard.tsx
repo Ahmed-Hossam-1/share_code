@@ -15,17 +15,14 @@ const PostCard: FC<{ post: Post; refetch: () => unknown; hideDiscuss?: boolean }
   refetch,
   hideDiscuss,
 }) => {
-  const { id, title, url: postUrl, user_id, liked } = post;
-
-  console.log(liked);
-
+  const { id, title, url: postUrl, user_id, liked, postedAt } = post;
   const { user, error, isLoading } = useGetUser(user_id);
   const { countCommentsRes } = useCountComments(id);
   // const { data: countLike } = useCountLike(id);
 
   const userName = isLoading || !user ? '...' : error ? '<unknown>' : user.username;
   const commentsCount = countCommentsRes?.count ?? 0;
-  const urlWithProtocol = postUrl.startsWith('http') ? postUrl : 'http://' + postUrl;
+  const urlWithProtocol = postUrl?.startsWith('http') ? postUrl : 'http://' + postUrl;
 
   const toggleLike = useCallback(
     async (postId: string, like: boolean) => {
@@ -55,11 +52,9 @@ const PostCard: FC<{ post: Post; refetch: () => unknown; hideDiscuss?: boolean }
 
       <Box>
         <Flex align="center">
-          <a href={urlWithProtocol}>
-            <Text color="gray.600" fontWeight="bold" pr={2} style={{ unicodeBidi: 'plaintext' }}>
-              {title}
-            </Text>
-          </a>
+          <Text color="gray.600" fontWeight="bold" pr={2} style={{ unicodeBidi: 'plaintext' }}>
+            {title}
+          </Text>
 
           <a href={urlWithProtocol}>
             <Text fontSize="sm" color="gray.400">
@@ -87,11 +82,11 @@ const PostCard: FC<{ post: Post; refetch: () => unknown; hideDiscuss?: boolean }
         </Flex>
         <Flex gap={1} fontSize="sm" color="gray.500">
           <Text>By:</Text>
-          <Link to="#">
+          <Link to={`/profile/${user_id}`}>
             <Text fontWeight="bold">{userName}</Text>
           </Link>
 
-          <Text> - {formatDistance(post.postedAt, Date.now(), { addSuffix: true })}</Text>
+          <Text> - {formatDistance(postedAt, Date.now(), { addSuffix: true })}</Text>
         </Flex>
       </Box>
     </Flex>
@@ -103,7 +98,7 @@ export default PostCard;
 const getUrlDomain = (url: string): string => {
   try {
     const short = new URL(url).host;
-    return short.startsWith('www.') ? short.substring(4) : short;
+    return short?.startsWith('www.') ? short.substring(4) : short;
   } catch {
     return url;
   }

@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface User {
   id?: string;
   first_name: string;
   last_name: string;
   username: string;
   email: string;
+  password?: string;
+  avatar?: any;
 }
 
 export interface Post {
@@ -31,4 +34,10 @@ export interface Comment {
 
 export interface jwtType {
   jwt: string;
+}
+
+export interface TNewPost {
+  url: string;
+  title: string;
+  userId: string;
 }

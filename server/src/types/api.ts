@@ -14,7 +14,7 @@ export interface GetPostResponse {
 export type DeletePostRequest = { postId: string };
 export type DeletePostResponse = {};
 // comments
-export type CreateCommentRequest = Pick<Comment, 'comment' | 'userId'>;
+export type CreateCommentRequest = Pick<Comment, 'comment'>;
 export interface CreateCommentResponse {}
 export type CountCommentsRequest = { postId: string };
 export type CountCommentsResponse = { count: number };
@@ -25,16 +25,19 @@ export type DeleteCommentResponse = {};
 export type DeleteCommentRequest = {};
 // users
 export type GetUserRequest = {};
-export type GetUserResponse = Pick<User, 'id' | 'first_name' | 'last_name' | 'username'>;
+export type GetUserResponse = Pick<
+  User,
+  'id' | 'first_name' | 'last_name' | 'username' | 'email' | 'avatar'
+>;
 export type GetCurrentUserRequest = Pick<User, 'id'>;
 export type GetCurrentUserResponse = Pick<
   User,
-  'id' | 'first_name' | 'last_name' | 'username' | 'email'
+  'id' | 'first_name' | 'last_name' | 'username' | 'email' | 'avatar'
 >;
-export type SignUpRequest = Pick<
-  User,
-  'first_name' | 'last_name' | 'username' | 'email' | 'password'
->;
+export type SignUpRequest = {
+  user: Pick<User, 'first_name' | 'last_name' | 'username' | 'email' | 'password'>;
+  avatar: any;
+};
 export type SignUpResponse = {
   user: Pick<User, 'first_name' | 'last_name' | 'username' | 'email' | 'id'>;
   jwt: string;

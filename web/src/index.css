@@ -1,0 +1,9 @@
+.avatarH {
+  width: 40px;
+  border-radius: 50%;
+}
+.profH {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
