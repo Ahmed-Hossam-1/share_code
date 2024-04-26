@@ -8,6 +8,7 @@ import { newPostSchema } from '../utils/validations';
 import { useNavigate } from 'react-router-dom';
 import { useNewPost } from '../services/mutations';
 import { useCurrentUser } from '../context/CurrentUser';
+import { toast } from 'react-hot-toast';
 
 const NewPosts = () => {
   type TNewPost = z.infer<typeof newPostSchema>;
@@ -21,7 +22,8 @@ const NewPosts = () => {
     resolver: zodResolver(newPostSchema),
   });
 
-  const { mutate } = useNewPost();
+  const { mutate, data, error } = useNewPost();
+  console.log(data, error);
   const { currentUser } = useCurrentUser();
   const nav = useNavigate();
   const onSubmit: SubmitHandler<TNewPost> = async (values: TNewPost) => {
@@ -29,8 +31,14 @@ const NewPosts = () => {
       ...values,
       userId: currentUser?.id || '',
     });
-    nav('/home');
-    reset();
+    if (data) {
+      toast.success('Post created successfully');
+      nav('/home');
+      reset();
+    }
+    if (error) {
+      toast.error(error.response.data.error);
+    }
   };
 
   return (

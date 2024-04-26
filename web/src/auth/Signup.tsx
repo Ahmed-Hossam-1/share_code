@@ -9,6 +9,7 @@ import { useSignupUser } from '../services/mutations';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { useCurrentUser } from '../context/CurrentUser';
+import toast from 'react-hot-toast';
 
 const Signup = () => {
   const [avatar, setAvatar] = useState();
@@ -29,7 +30,8 @@ const Signup = () => {
     resolver: zodResolver(signupSchema),
   });
   const { refetchCurrentUser } = useCurrentUser();
-  const { mutate, isPending, data: user } = useSignupUser();
+  const { mutate, isPending, data: user, error } = useSignupUser();
+  console.log(error);
   const nav = useNavigate();
   const onSubmit: SubmitHandler<ISignUp> = (values: ISignUp) => {
     console.log(avatar, 'immmmmmmmm');
@@ -42,14 +44,17 @@ const Signup = () => {
     formData.append('first_name', values.first_name);
     formData.append('last_name', values.last_name);
     mutate(formData);
-
-    refetchCurrentUser();
-    reset();
   };
 
   useEffect(() => {
-    user && nav('/home');
-  }, [nav, user]);
+    if (user) {
+      toast.success('Successfully signed up');
+      refetchCurrentUser();
+      reset();
+      nav('/home');
+    }
+    error && toast.error(error.response.data.error);
+  }, [nav, user, error]);
 
   const openImage = useRef<any>(null);
 

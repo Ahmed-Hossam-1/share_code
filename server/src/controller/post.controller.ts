@@ -30,6 +30,8 @@ export const createPost: ExpressHandler<CreatePostRequest, CreatePostResponse> =
   if (!req.body?.title || !req.body?.url || !req.body?.userId) {
     return res.sendStatus(400);
   }
+  const uriExist = await db.getPostByUrl(req.body?.url);
+  if (uriExist) return res.status(400).send({ error: 'Post with this url already exists.' });
   const newPost: Post = {
     id: crypto.randomUUID(),
     title: req.body.title,

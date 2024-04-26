@@ -5,4 +5,5 @@ export interface PostDao {
   createPost(post: Post): Promise<void>;
   getPost(id: string, userId?: string): Promise<Post | undefined>;
   deletePost(id: string): Promise<void>;
+  getPostByUrl(url: string): Promise<Post | undefined>;
 }

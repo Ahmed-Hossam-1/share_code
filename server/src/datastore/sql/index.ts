@@ -89,6 +89,10 @@ export class SqlDataStore implements DataStore {
     );
   }
 
+  async getPostByUrl(url: string): Promise<Post | undefined> {
+    return await this.db.get<Post>(`SELECT * FROM posts WHERE url = ?`, url);
+  }
+
   // comments
   async createComments(comment: Comment): Promise<void> {
     await this.db.run(
@@ -112,18 +116,6 @@ export class SqlDataStore implements DataStore {
       postId
     );
   }
-
-  // async listComments(postId: string, userId: string): Promise<Comment[]> {
-  //   return await this.db.all<Comment[]>(
-  //     `SELECT *, EXISTS(
-  //     SELECT 1 FROM likeComments WHERE likeComments.commentId = comments.id AND likeComments.userId = ?) as liked
-  //      FROM comments
-  //      WHERE postId = ?
-  //      ORDER BY postedAt DESC`,
-  //     userId,
-  //     postId
-  //   );
-  // }
 
   async deleteComment(id: string): Promise<void> {
     await this.db.run('DELETE FROM comments WHERE id = ?', id);
