@@ -1,5 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { countLike, getComments, getPosts, getSinglePost, getUser } from './endPoint';
+import {
+  countLike,
+  countLikeComments,
+  getComments,
+  getPosts,
+  getSinglePost,
+  getUser,
+} from './endPoint';
 
 // export const usePosts = () => {
 //   return useQuery({
@@ -25,6 +32,13 @@ export const useCountLike = (postId: string) => {
   return useQuery({
     queryKey: ['countLike', postId],
     queryFn: () => countLike(postId),
+  });
+};
+
+export const useCountLikeComment = (commentId: string) => {
+  return useQuery({
+    queryKey: ['countLikeComments', commentId],
+    queryFn: () => countLikeComments(commentId),
   });
 };
 

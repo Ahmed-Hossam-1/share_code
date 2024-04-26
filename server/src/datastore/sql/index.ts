@@ -2,7 +2,7 @@ import sqlite3 from 'sqlite3';
 import { open, Database } from 'sqlite';
 import path from 'path';
 import { DataStore } from '..';
-import { User, Post, Like, Comment } from '../../types/types';
+import { User, Post, Like, Comment, LikeComment } from '../../types/types';
 
 export class SqlDataStore implements DataStore {
   private db!: Database<sqlite3.Database, sqlite3.Statement>;
@@ -22,6 +22,7 @@ export class SqlDataStore implements DataStore {
     return this;
   }
 
+  // Users
   async createUser(_user: User): Promise<void> {
     await this.db.run(
       'INSERT INTO users (id,email,password,first_name,last_name,userName,avatar) VALUES (?,?,?,?,?,?,?)',
@@ -41,6 +42,26 @@ export class SqlDataStore implements DataStore {
 
   getUserByUsername(username: string): Promise<User | undefined> {
     return this.db.get<User>(`SELECT * FROM users WHERE username = ?`, username);
+  }
+
+  getUserById(id: string): Promise<User | undefined> {
+    return this.db.get<User>(`SELECT * FROM users WHERE id = ?`, id);
+  }
+
+  // Posts
+  async getPost(id: string, userId: string): Promise<Post | undefined> {
+    return await this.db.get<Post>(
+      `SELECT *, EXISTS(
+        SELECT 1 FROM likes WHERE likes.postId = ? AND likes.userId = ?
+      ) as liked FROM posts WHERE id = ?`,
+      id,
+      userId,
+      id
+    );
+  }
+
+  async deletePost(id: string): Promise<void> {
+    await this.db.run('Delete FROM posts WHERE id = ?', id);
   }
 
   listPosts(userId?: string, options?: { page?: number; pageSize?: number }): Promise<Post[]> {
@@ -68,25 +89,7 @@ export class SqlDataStore implements DataStore {
     );
   }
 
-  getUserById(id: string): Promise<User | undefined> {
-    return this.db.get<User>(`SELECT * FROM users WHERE id = ?`, id);
-  }
-
-  async getPost(id: string, userId: string): Promise<Post | undefined> {
-    return await this.db.get<Post>(
-      `SELECT *, EXISTS(
-        SELECT 1 FROM likes WHERE likes.postId = ? AND likes.userId = ?
-      ) as liked FROM posts WHERE id = ?`,
-      id,
-      userId,
-      id
-    );
-  }
-
-  async deletePost(id: string): Promise<void> {
-    await this.db.run('Delete FROM posts WHERE id = ?', id);
-  }
-
+  // comments
   async createComments(comment: Comment): Promise<void> {
     await this.db.run(
       'INSERT INTO Comments(id, userId, postId, comment, postedAt) VALUES(?,?,?,?,?)',
@@ -98,12 +101,29 @@ export class SqlDataStore implements DataStore {
     );
   }
 
-  async listComments(postId: string): Promise<Comment[]> {
+  async listComments(postId: string, userId: string): Promise<Comment[]> {
     return await this.db.all<Comment[]>(
-      'SELECT * FROM comments WHERE postId = ? ORDER BY postedAt DESC',
+      `SELECT comments.*, 
+       EXISTS(SELECT 1 FROM likeComments WHERE likeComments.commentId = comments.id AND likeComments.userId = ?) as liked 
+       FROM comments 
+       WHERE postId = ? 
+       ORDER BY postedAt DESC`,
+      userId,
       postId
     );
   }
+
+  // async listComments(postId: string, userId: string): Promise<Comment[]> {
+  //   return await this.db.all<Comment[]>(
+  //     `SELECT *, EXISTS(
+  //     SELECT 1 FROM likeComments WHERE likeComments.commentId = comments.id AND likeComments.userId = ?) as liked
+  //      FROM comments
+  //      WHERE postId = ?
+  //      ORDER BY postedAt DESC`,
+  //     userId,
+  //     postId
+  //   );
+  // }
 
   async deleteComment(id: string): Promise<void> {
     await this.db.run('DELETE FROM comments WHERE id = ?', id);
@@ -117,6 +137,18 @@ export class SqlDataStore implements DataStore {
     return result?.count ?? 0;
   }
 
+  async getComment(id: string, userId?: string): Promise<Comment | undefined> {
+    return await this.db.get<Comment>(
+      `SELECT *, EXISTS(
+        SELECT 1 FROM likeComments WHERE likeComments.commentId = ? AND likeComments.userId = ?
+      ) as liked FROM comments WHERE id = ?`,
+      id,
+      userId,
+      id
+    );
+  }
+
+  // like Posts
   async createLike(like: Like): Promise<void> {
     await this.db.run('INSERT INTO likes(userId, postId) VALUES(?,?)', like.userId, like.postId);
   }
@@ -141,6 +173,41 @@ export class SqlDataStore implements DataStore {
     let awaitResult = await this.db.get<number>(
       'SELECT 1 FROM likes WHERE postId = ? and userId = ?',
       like.postId,
+      like.userId
+    );
+    let val: boolean = awaitResult === undefined ? false : true;
+    return val;
+  }
+
+  // Like a comments
+  async createLikeComment(like: LikeComment | undefined): Promise<void> {
+    await this.db.run(
+      'INSERT INTO likeComments(userId, commentId) VALUES(?,?)',
+      like?.userId,
+      like?.commentId
+    );
+  }
+
+  async deleteLikeComment(like: LikeComment): Promise<void> {
+    await this.db.run(
+      'DELETE FROM likeComments WHERE userId = ? AND commentId = ?',
+      like.userId,
+      like.commentId
+    );
+  }
+
+  async getLikesComment(commentId: string): Promise<number> {
+    let result = await this.db.get<{ count: number }>(
+      'SELECT COUNT(*) as count FROM likeComments WHERE commentId = ?',
+      commentId
+    );
+    return result?.count ?? 0;
+  }
+
+  async existsComment(like: LikeComment): Promise<boolean> {
+    let awaitResult = await this.db.get<number>(
+      'SELECT 1 FROM likeComments WHERE commentId = ? and userId = ?',
+      like.commentId,
       like.userId
     );
     let val: boolean = awaitResult === undefined ? false : true;

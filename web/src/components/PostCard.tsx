@@ -19,7 +19,6 @@ const PostCard: FC<{ post: Post; refetch: () => unknown; hideDiscuss?: boolean }
   const { user, error, isLoading } = useGetUser(user_id);
   const { countCommentsRes } = useCountComments(id);
   const { data: countLike, refetch: refetchCountLike } = useCountLike(id);
-  console.log(liked, 'liked');
 
   const userName = isLoading || !user ? '...' : error ? '<unknown>' : user.username;
   const commentsCount = countCommentsRes?.count ?? 0;
@@ -35,21 +34,31 @@ const PostCard: FC<{ post: Post; refetch: () => unknown; hideDiscuss?: boolean }
       refetchCountLike();
       refetch();
     },
-    [refetch, liked, countLike]
+    [refetch, refetchCountLike]
   );
 
   return (
-    <Flex m={4} gap={2} align="baseline">
-      <Box position="relative" w={4} onClick={() => toggleLike(id, !liked)}>
-        <Icon
-          position="absolute"
-          top="-0.8rem"
-          as={liked ? BsHeartFill : BsHeart}
-          fill="gray"
-          cursor="pointer"
-          _hover={{ fill: 'brown' }}
-        />
-        <span>{countLike?.likes}</span>
+    <Flex m={4} ml={10} gap={2} align="center">
+      <Box top="0.45rem" position="relative" w={4} onClick={() => toggleLike(id, !liked)}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '2px',
+          }}
+        >
+          <Icon
+            position="absolute"
+            top="-0.8rem"
+            as={liked ? BsHeartFill : BsHeart}
+            fill="gray"
+            cursor="pointer"
+            _hover={{ fill: 'brown' }}
+          />
+          <span style={{ fontWeight: 'bold' }}>{countLike?.likes}</span>
+        </div>
       </Box>
 
       <Box>

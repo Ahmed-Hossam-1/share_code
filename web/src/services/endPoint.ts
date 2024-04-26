@@ -8,7 +8,7 @@ import {
   SignInResponse,
   SignUpResponse,
 } from '../types/api';
-import { Post, TNewPost, User } from '../types/types';
+import { Post, TcommentData, TNewPost, User } from '../types/types';
 import Cookies from 'js-cookie';
 // import { Post } from '../types/types';
 
@@ -111,14 +111,14 @@ export const countComments = async (id: string) => {
 };
 
 export const getComments = async (postId: string | undefined) => {
-  const data = await axiosInstance.get<ListCommentsResponse>(`/api/comments/${postId}`);
+  const data = await axiosInstance.get<ListCommentsResponse>(`/api/comments/${postId}`, {
+    headers: {
+      Authorization: 'Bearer ' + Cookies.get('jwt'),
+      Accept: 'application/json',
+    },
+  });
   return data.data;
 };
-
-interface TcommentData {
-  postId: string | undefined;
-  comment: string;
-}
 
 export const createComment = async (commentData: TcommentData) => {
   console.log(commentData, 'commentData');
@@ -158,5 +158,31 @@ export const deleteLike = async (postId: string) => {
 
 export const countLike = async (postId: string) => {
   const data = await axiosInstance.get(`/api/likes/${postId}/count`);
+  return data.data;
+};
+
+// Likes Comments
+export const createLikeComment = async (commentId: string) => {
+  const data = await axiosInstance.get(`/api/likes/comments/${commentId}`, {
+    headers: {
+      Authorization: 'Bearer ' + Cookies.get('jwt'),
+      Accept: 'application/json',
+    },
+  });
+  return data.data;
+};
+
+export const deleteLikeComment = async (commentId: string) => {
+  const data = await axiosInstance.delete(`/api/likes/comments/${commentId}`, {
+    headers: {
+      Authorization: 'Bearer ' + Cookies.get('jwt'),
+      Accept: 'application/json',
+    },
+  });
+  return data.data;
+};
+
+export const countLikeComments = async (commentId: string) => {
+  const data = await axiosInstance.get<{ likes: number }>(`/api/likes/comments/${commentId}/count`);
   return data.data;
 };

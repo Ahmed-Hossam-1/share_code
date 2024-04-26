@@ -41,3 +41,8 @@ export interface TNewPost {
   title: string;
   userId: string;
 }
+
+export interface TcommentData {
+  postId: string | undefined;
+  comment: string;
+}

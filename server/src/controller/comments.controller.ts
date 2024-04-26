@@ -1,11 +1,11 @@
 import { db } from '../datastore';
-import { CountCommentsResponse, DeleteCommentResponse, ListCommentsResponse } from '../types/api';
+import { CountCommentsResponse, DeleteCommentResponse } from '../types/api';
 import { Comment, ExpressHandlerWithParams } from '../types/types';
 import crypto from 'crypto';
 
 export const createComments = async (req: any, res: any) => {
   const comment = req.body.comment;
-  console.log(comment, 'ccccccccommmmmeeennt');
+
   if (!req.params.postId) return res.status(400).send({ error: 'ID MISSING' });
   if (!comment) return res.status(400).send({ error: 'COMMENTS MISSING' });
 
@@ -24,16 +24,12 @@ export const createComments = async (req: any, res: any) => {
   res.sendStatus(200);
 };
 
-export const listComments: ExpressHandlerWithParams<
-  { postId: string },
-  null,
-  ListCommentsResponse
-> = async (req, res) => {
+export const listComments = async (req: any, res: any) => {
   if (!req.params.postId) {
     return res.status(400).send({ error: 'POST ID MISSING' });
   }
-
-  const comments = await db.listComments(req.params.postId);
+  if (!res.locals.userId) return res.status(401).send({ error: 'UNAUTHORIZED' });
+  const comments = await db.listComments(req.params.postId, res.locals.userId);
   return res.send({ comments });
 };
 

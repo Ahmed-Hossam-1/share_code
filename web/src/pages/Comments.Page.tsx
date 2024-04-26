@@ -18,7 +18,6 @@ const CommentsPage = () => {
     refetch: refetchComments,
   } = useListComments(postId!);
   const { data: postText, refetch: refetchPost, isLoading, error } = usePost(postId!);
-  console.log(postText, 'pooooooooost');
 
   const postname = isLoading ? 'Loading...' : error || !postText ? 'Error' : postText.post.title;
   useDocumentTitle(postname);
@@ -66,7 +65,7 @@ const CommentsPage = () => {
             </Box>
 
             {commentText?.comments.map(comment => (
-              <CommentCard key={comment.id} comments={comment} />
+              <CommentCard key={comment.id} comments={comment} refetchComments={refetchComments} />
             ))}
 
             {!commentText?.comments.length && (

@@ -23,6 +23,11 @@ export interface Like {
   postId: string;
 }
 
+export interface LikeComment {
+  userId: string;
+  commentId: string;
+}
+
 export interface Comment {
   id: string;
   userId: string;

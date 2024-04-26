@@ -4,4 +4,4 @@ CREATE TABLE likeComments (
   FOREIGN KEY (userId) REFERENCES users (id),
   FOREIGN KEY (commentId) REFERENCES comments (id),
   PRIMARY KEY (userId, commentId)
-);
+); 
