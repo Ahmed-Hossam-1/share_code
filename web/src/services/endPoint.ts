@@ -28,8 +28,12 @@ export const createPosts = async (postData: TNewPost) => {
   return data.data;
 };
 
-export const getPosts = async () => {
+export const getPosts = async ({ pageParam = 1, pageSize = 8 }) => {
   const data = await axiosInstance.get<ListPostResponse>('/api/posts', {
+    params: {
+      page: pageParam,
+      pageSize,
+    },
     headers: {
       Authorization: 'Bearer ' + Cookies.get('jwt'),
       Accept: 'application/json',
@@ -38,8 +42,23 @@ export const getPosts = async () => {
   return data.data;
 };
 
+// export const getPosts = async () => {
+//   const data = await axiosInstance.get<ListPostResponse>('/api/posts', {
+//     headers: {
+//       Authorization: 'Bearer ' + Cookies.get('jwt'),
+//       Accept: 'application/json',
+//     },
+//   });
+//   return data.data;
+// };
+
 export const getSinglePost = async (postId: string) => {
-  const data = await axiosInstance.get<{ post: Post }>(`/api/posts/${postId}`);
+  const data = await axiosInstance.get<{ post: Post }>(`/api/posts/${postId}`, {
+    headers: {
+      Authorization: 'Bearer ' + Cookies.get('jwt'),
+      Accept: 'application/json',
+    },
+  });
   return data.data;
 };
 
@@ -105,7 +124,7 @@ export const createComment = async (commentData: TcommentData) => {
   console.log(commentData, 'commentData');
   const data = await axiosInstance.post<Comment>(
     `/api/comments/${commentData.postId}`,
-    commentData.comment,
+    { comment: commentData.comment },
     {
       headers: {
         Authorization: 'Bearer ' + Cookies.get('jwt'),

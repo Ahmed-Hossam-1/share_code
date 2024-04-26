@@ -1,10 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { countLike, getComments, getPosts, getSinglePost, getUser } from './endPoint';
 
-export const usePosts = () => {
+// export const usePosts = () => {
+//   return useQuery({
+//     queryKey: ['posts'],
+//     queryFn: getPosts,
+//   });
+// };
+export const usePosts = (pageParam: number) => {
   return useQuery({
-    queryKey: ['posts'],
-    queryFn: getPosts,
+    queryKey: ['posts', { pageParam, pageSize: 8 }],
+    queryFn: () => getPosts({ pageParam, pageSize: 8 }),
   });
 };
 

@@ -6,7 +6,7 @@ import { useListComments, usePost } from '../services/queries';
 import CommentCard from '../components/CommentCard';
 import PostCard from '../components/PostCard';
 import { useState } from 'react';
-// import { useDocumentTitle } from '../utils/useDocumentTitle';
+import { useDocumentTitle } from '../utils/useDocumentTitle';
 import { createComment } from '../services/endPoint';
 
 const CommentsPage = () => {
@@ -15,19 +15,19 @@ const CommentsPage = () => {
     data: commentText,
     error: commentsError,
     isLoading: commentsLoading,
-    // refetch: refetchComments,
+    refetch: refetchComments,
   } = useListComments(postId!);
   const { data: postText, refetch: refetchPost, isLoading, error } = usePost(postId!);
   console.log(postText, 'pooooooooost');
 
   const postname = isLoading ? 'Loading...' : error || !postText ? 'Error' : postText.post.title;
-  console.log(postname);
+  useDocumentTitle(postname);
   const [comment, setComment] = useState('');
   const submitComment = async () => {
-    console.log(comment, 'first');
     const postId = postText?.post.id;
     await createComment({ postId, comment });
-    // refetchComments();
+    setComment('');
+    refetchComments();
   };
   return (
     <div>
@@ -45,7 +45,8 @@ const CommentsPage = () => {
               style={{ unicodeBidi: 'plaintext' }}
             />
             <Box>
-              <span
+              <button
+                type="button"
                 onClick={submitComment}
                 style={{
                   cursor: comment.length >= 1 ? 'pointer' : 'not-allowed',
@@ -54,10 +55,10 @@ const CommentsPage = () => {
                   borderRadius: '5px',
                   color: 'white',
                 }}
-                // disabled={comment.length == 0 ? true : false}
+                disabled={comment.length == 0 ? true : false}
               >
                 Add comment
-              </span>
+              </button>
             </Box>
 
             <Box w="xl">

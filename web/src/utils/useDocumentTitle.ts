@@ -1,7 +1,7 @@
-// import { useEffect } from 'react';
+import { useEffect } from 'react';
 
-// export const useDocumentTitle = (title: string) => {
-//   useEffect(() => {
-//     document.title = 'Codersquare | ' + title;
-//   }, [title]);
-// };
+export const useDocumentTitle = (title: string) => {
+  useEffect(() => {
+    document.title = 'ShareCode | ' + title;
+  }, [title]);
+};

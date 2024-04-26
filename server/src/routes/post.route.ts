@@ -5,4 +5,4 @@ import { authMiddleware } from '../middleware/authMiddleware';
 export const postRouter = express.Router();
 // authMiddleware
 postRouter.route('/').post(createPost).get(authMiddleware, listPosts);
-postRouter.route('/:postId').get(singlePost).delete(deletePost);
+postRouter.route('/:postId').get(authMiddleware, singlePost).delete(deletePost);

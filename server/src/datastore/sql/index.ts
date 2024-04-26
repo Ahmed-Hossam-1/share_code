@@ -43,12 +43,17 @@ export class SqlDataStore implements DataStore {
     return this.db.get<User>(`SELECT * FROM users WHERE username = ?`, username);
   }
 
-  listPosts(userId?: string): Promise<Post[]> {
+  listPosts(userId?: string, options?: { page?: number; pageSize?: number }): Promise<Post[]> {
+    const { page = 1, pageSize = 10 } = options || {};
+    const offset = (page - 1) * pageSize;
     return this.db.all<Post[]>(
       `SELECT *, EXISTS(
         SELECT 1 FROM likes WHERE likes.postId = posts.id AND likes.userId = ?
-      ) as liked FROM posts ORDER BY postedAt DESC`,
-      userId
+      ) as liked 
+      FROM posts 
+      ORDER BY postedAt DESC
+      LIMIT ? OFFSET ?`,
+      [userId, pageSize, offset]
     );
   }
 

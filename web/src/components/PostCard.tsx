@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import { formatDistance } from 'date-fns/formatDistance';
 import { useQuery } from '@tanstack/react-query';
 import { countComments, createLike, deleteLike, getUser } from '../services/endPoint';
-// import { useCountLike } from '../services/queries';
+import { useCountLike } from '../services/queries';
 
 const PostCard: FC<{ post: Post; refetch: () => unknown; hideDiscuss?: boolean }> = ({
   post,
@@ -18,7 +18,8 @@ const PostCard: FC<{ post: Post; refetch: () => unknown; hideDiscuss?: boolean }
   const { id, title, url: postUrl, user_id, liked, postedAt } = post;
   const { user, error, isLoading } = useGetUser(user_id);
   const { countCommentsRes } = useCountComments(id);
-  // const { data: countLike } = useCountLike(id);
+  const { data: countLike, refetch: refetchCountLike } = useCountLike(id);
+  console.log(liked, 'liked');
 
   const userName = isLoading || !user ? '...' : error ? '<unknown>' : user.username;
   const commentsCount = countCommentsRes?.count ?? 0;
@@ -31,9 +32,10 @@ const PostCard: FC<{ post: Post; refetch: () => unknown; hideDiscuss?: boolean }
       } else {
         await deleteLike(postId);
       }
+      refetchCountLike();
       refetch();
     },
-    [refetch, liked]
+    [refetch, liked, countLike]
   );
 
   return (
@@ -47,7 +49,7 @@ const PostCard: FC<{ post: Post; refetch: () => unknown; hideDiscuss?: boolean }
           cursor="pointer"
           _hover={{ fill: 'brown' }}
         />
-        {/* <span>{countLike?.likes}</span> */}
+        <span>{countLike?.likes}</span>
       </Box>
 
       <Box>

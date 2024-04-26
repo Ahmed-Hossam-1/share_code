@@ -10,13 +10,17 @@ import {
 } from '../types/api';
 import { ExpressHandler, Post } from '../types/types';
 
-export const listPosts: ExpressHandler<ListPostRequest, ListPostResponse> = async (__, res) => {
+export const listPosts: ExpressHandler<ListPostRequest, ListPostResponse> = async (req, res) => {
   const userId: string = res.locals.userId;
-  // console.log(userId, 'userId');
   if (!userId) return res.sendStatus(401);
-  const postDB = await db.listPosts();
-
-  res.send({ posts: postDB });
+  const page = parseInt(req.query.page as string) || 1;
+  const pageSize = parseInt(req.query.pageSize as string) || 10;
+  try {
+    const postDB = await db.listPosts(userId, { page, pageSize });
+    res.send({ posts: postDB });
+  } catch (error) {
+    res.status(500).send({ error: 'Failed to fetch posts.' });
+  }
 };
 
 export const createPost: ExpressHandler<CreatePostRequest, CreatePostResponse> = async (
@@ -44,7 +48,9 @@ export const singlePost = async (req: any, res: any) => {
   if (!postId) {
     return res.sendStatus(400);
   }
-  const post: any = await db.getPost(postId, res.locals.userId);
+  const userId = res.locals.userId;
+  if (!userId) return res.sendStatus(401);
+  const post: any = await db.getPost(postId, userId);
   if (!post) {
     return res.sendStatus(404);
   }
